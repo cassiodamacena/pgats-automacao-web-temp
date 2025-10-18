@@ -1,0 +1,7 @@
+{
+    "name": "Cassio",
+    "email": "cassio@email.com.br",
+    "subject": "Assunto contato aqui",
+    "message": "Mensagem cotato teste vai aqui",
+    "file": "cypress/fixtures/example.json"
+}
