@@ -29,6 +29,14 @@ jobs:
         command: npm run test:exercicios
         browser: chrome
 
+    - name: Upload reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cypress-reports
+        path: reports/**
+        if-no-files-found: ignore
+
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
       if: failure()
