@@ -30,7 +30,7 @@ jobs:
         browser: chrome
 
     - name: Upload screenshots
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: cypress-screenshots
@@ -38,7 +38,7 @@ jobs:
         if-no-files-found: ignore
 
     - name: Upload videos
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: cypress-videos
