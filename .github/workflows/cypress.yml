@@ -34,7 +34,7 @@ jobs:
       if: always()
       with:
         name: cypress-reports
-        path: reports/**
+        path: cypress/reports/**
         if-no-files-found: ignore
 
     - name: Upload screenshots
