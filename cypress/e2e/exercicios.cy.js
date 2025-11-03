@@ -1,117 +1,155 @@
-it('1 - Register User', function () {
-  cy.visit('https://automationexercise.com/');
-  cy.get('#header [href="/login"]').click();
 
-  // Cadastro inicial
-  cy.get('[data-qa="signup-name"]').type('cassio');
-  cy.get('[data-qa="signup-email"]').type('cassio@email.com.br');
-  cy.get('[data-qa="signup-button"]').click();
+import testData from '../fixtures/testData.json';
 
-  // Formulário de criação de conta
-  cy.get('#id_gender1').check();
-  cy.get('[data-qa="password"]').type('cassio');
-  cy.get('[data-qa="days"]').select('1');
-  cy.get('[data-qa="months"]').select('5');
-  cy.get('[data-qa="years"]').select('1987');
-  cy.get('[name="newsletter"]').check();
-  cy.get('[name="optin"]').check();
-  cy.get('[data-qa="first_name"]').type('cassio');
-  cy.get('[data-qa="last_name"]').type('damacena');
-  cy.get('[data-qa="company"]').type('QA Consulting LTDA');
-  cy.get('[data-qa="address"]').type('Endereço 1');
-  cy.get('[data-qa="address2"]').type('Endereço 2');
-  cy.get('[data-qa="country"]').select('United States');
-  cy.get('[data-qa="state"]').type('FL');
-  cy.get('[data-qa="city"]').type('MIAMI');
-  cy.get('[data-qa="zipcode"]').type('10123456');
-  cy.get('[data-qa="mobile_number"]').type('12912345678');
-  cy.get('[data-qa="create-account"]').click();
 
-  // Confirmação de conta criada
-  cy.get('[data-qa="account-created"]').should('have.text', 'Account Created!');
-  cy.get('[data-qa="continue-button"]').should('be.visible').click();
+describe('Automation Exercise - Test Cases', function () {
 
-  // Logout e exclusão de conta
-  cy.get('#header [href="/logout"]').should('be.visible');
-  cy.get('#header [href="/delete_account"]').should('be.visible').click();
-  cy.get('[data-qa="account-deleted"]').should('be.visible');
-  cy.get('[data-qa="continue-button"]').should('be.visible').click();
+  const { users, address } = testData;
 
-  // Verificação final
-  cy.get('#header [href="/login"]').should('be.visible');
+  it('Test Case 1: Register User', function () {
+    cy.goToSignupLogin();
+    cy.fillNewUserForm(users.new.name, users.new.email);
+    cy.fillSignupForm(users.new, address);
+    cy.verifyAccountCreatedAndLogout();
+    cy.deleteAccount();
+  });
 
-});
+  it('Test Case 2-4: Login User with correct email and password and Logout User', function () {
+    cy.goToSignupLogin();
+    cy.fillLoginForm(users.existing.email, users.existing.password);
+    
+    // Verificar login bem-sucedido
+    cy.get('#header b').should('have.text', users.existing.name);
+    cy.logout();
 
-it('2-4 - Login User with correct email and password and Logout User', function () {
-  cy.visit('https://automationexercise.com/')
-  cy.get('#header a[href="/login"]').should('be.visible');
-  cy.get('#header a[href="/login"]').click();
-  cy.get('#form div.login-form h2').should('be.visible');
-  cy.get('[data-qa="login-email"]').click().type('cassio-login@email.com.br');
-  cy.get('[data-qa="login-password"]').click().type('cassio123');
-  cy.get('[data-qa="login-button"]').click();
-  cy.get('#header b').should('have.text', 'cassio-login');
-  cy.get('#header a[href="/logout"]').should('be.visible').click();
-  cy.get('#header a[href="/login"]').should('be.visible');
-});
+    // Verificar logout bem-sucedido
+    cy.get('#header a[href="/login"]').should('be.visible');
+  });
 
-it('3 - Login User with incorrect email and password', function () {
-  cy.visit('https://automationexercise.com/')
-  cy.get('#header a[href="/login"]').should('be.visible');
-  cy.get('#header a[href="/login"]').click();
-  cy.get('#form div.login-form h2').should('be.visible');
-  cy.get('[data-qa="login-email"]').click().type('cassio-login@email.com.br');
-  cy.get('[data-qa="login-password"]').click().type('cassio1234');
-  cy.get('[data-qa="login-button"]').click();
-  cy.get('#form p').should('have.text', 'Your email or password is incorrect!');
-});
+  it('Test Case 3: Login User with incorrect email and password', function () {
+    cy.goToSignupLogin();
+    cy.fillLoginForm(users.existing.email, 'wrong-password');
+    
+    // Verificar dados inválidos para login
+    cy.get('#form p').should('have.text', 'Your email or password is incorrect!');
+  });
 
-it('5 - Register User with existing email', function () {
-  cy.visit('https://automationexercise.com/');
-  cy.get('#header [href="/login"]').click();
-  
-  // Cadastro inicial
-  cy.get('[data-qa="signup-name"]').type('cassio-login');
-  cy.get('[data-qa="signup-email"]').type('cassio-login@email.com.br');
-  cy.get('[data-qa="signup-button"]').click();
-  cy.get('#form p').should('have.text', 'Email Address already exist!');
-});
+  it('Test Case 5: Register User with existing email', function () {
+    cy.goToSignupLogin();
+    cy.fillNewUserForm(users.existing.name, users.existing.email);
 
-it('6 - Contact Us Form', function() {
-  cy.visit('https://automationexercise.com/')
-  cy.get('#header a[href="/contact_us"]').should('be.visible');
-  cy.get('#header a[href="/contact_us"]').click();
-  cy.get('[data-qa="name"]').click().type('Cassio');
-  cy.get('[data-qa="email"]').type('cassio@email.com.br');
-  cy.get('[data-qa="subject"]').click().type('Assunto contato aqui');
-  cy.get('[data-qa="message"]').click().type('Mensagem do contato aqui');
-  cy.get('#contact-us-form [name="upload_file"]').click();
-  cy.get('[data-qa="submit-button"]').should('be.visible').click();
-  cy.get('#contact-page div.alert').should('have.text', 'Success! Your details have been submitted successfully.');
-  cy.get('#form-section a.btn').should('have.text', ' Home');
-  
-});
+    // Verificar mensagem de e-mail já existente
+    cy.get('#form p').should('have.text', 'Email Address already exist!');
+  });
 
-it('7 - Verify Test Cases Page', function() {
-  cy.visit('https://automationexercise.com/')
-  cy.get('#header a[href="/"]').should('have.text', ' Home');
-  cy.get('#header a[href="/test_cases"]').should('have.text', ' Test Cases').click();
-  cy.get('#form b').should('have.text', 'Test Cases');
-});
+  it('Test Case 6: Contact Us Form', function () {
+    // Dados do contato usando a fixture existente
+    const contactData = {
+      name: users.new.name,
+      email: users.new.email,
+      subject: 'Assunto contato aqui',
+      message: 'Mensagem do contato aqui'
+    };
 
-it('8 - Verify All Products and product detail page', function() {
-  cy.visit('https://automationexercise.com/')
-  cy.get('#header a[href="/"]').should('have.text', ' Home');
-  cy.get('#header a[href="/products"]').should('have.text', ' Products').click();
-  cy.get('h2.title').should('have.text', 'All Products');
-  cy.get('div.features_items').should('be.visible');
-  cy.get('a[href="/product_details/1"]').should('be.visible');
-  cy.get('a[href="/product_details/1"]').click();
-  cy.get('div.product-information h2').should('have.text', 'Blue Top');
-  cy.get('p:nth-child(3)').should('have.text', 'Category: Women > Tops');
-  cy.get('span:nth-child(5) span').should('have.text', 'Rs. 500');
-  cy.get('p:nth-child(6)').should('have.text', 'Availability: In Stock');
-  cy.get('p:nth-child(7)').should('be.visible');
-  cy.get('p:nth-child(8)').should('be.visible');
-  
+    // Navegar para a página de contato
+    cy.goToContactUs();
+    
+    // Preencher e enviar o formulário
+    cy.fillContactForm(
+      contactData.name,
+      contactData.email,
+      contactData.subject,
+      contactData.message
+    );
+
+    // Verificar sucesso do envio
+    cy.get('#contact-page div.alert')
+      .should('have.text', 'Success! Your details have been submitted successfully.');
+    cy.get('#form-section a.btn').should('have.text', ' Home');
+  });
+
+  it('Test Case 7 - Verify Test Cases Page', function () {
+    cy.goToTestCases();
+    cy.get('#form b').should('have.text', 'Test Cases');
+  });
+
+  it('Test Case 8 - Verify All Products and product detail page', function () {
+    // Navegar para produtos e verificar listagem
+    cy.goToProducts();
+    cy.get('h2.title').should('have.text', 'All Products');
+    cy.get('div.features_items').should('be.visible');
+
+    // Verificar detalhes do produto
+    cy.viewProductDetails(1);
+    cy.get('div.product-information h2').should('have.text', 'Blue Top');
+    cy.get('p:nth-child(3)').should('have.text', 'Category: Women > Tops');
+    cy.get('span:nth-child(5) span').should('have.text', 'Rs. 500');
+    cy.get('p:nth-child(6)').should('have.text', 'Availability: In Stock');
+    cy.get('p:nth-child(7)').should('be.visible');
+    cy.get('p:nth-child(8)').should('be.visible');
+  });
+
+  it('Test Case 9 - Search Product', function () {
+    // Navegar para produtos e realizar busca
+    cy.goToProducts();
+    cy.get('h2.title').should('have.text', 'All Products');
+    
+    // Buscar produto específico
+    cy.searchProduct('Blue Top');
+    
+    // Verificar resultado da busca
+    cy.get('h2.title').should('have.text', 'Searched Products');
+    cy.contains('.productinfo p', "Blue Top").should('be.visible');
+  });
+
+  it('Test Case 10: Verify Subscription in home page', function () {
+    cy.visit('/');
+    cy.subscribe(users.existing.email);
+    
+    // Verificar mensagem de sucesso
+    cy.get('#success-subscribe div.alert')
+      .should('have.text', 'You have been successfully subscribed!')
+      .should('be.visible');
+  });
+
+  it.only('Test Case 15: Place Order: Register before Checkout', function () {
+    const { users: { checkout: user }, checkout, payment } = testData;
+
+    // Registra um novo
+    cy.goToSignupLogin();
+    cy.fillNewUserForm(user.name, user.email);
+    cy.fillSignupForm(user, checkout.address);
+    cy.verifyAccountCreatedAndLogout();
+
+    // Adiciona produto ao carrinho e procede para checkout
+    cy.addProductToCart(1);
+    cy.proceedToCheckout();
+
+    // Verifica dados de entrega
+    cy.get('#address_invoice h3.page-subheading').should('have.text', 'Your billing address');
+    cy.verifyDeliveryAddress(checkout.address);
+    cy.fillOrderMessage(checkout.message);
+
+    // Processa pagamento
+    cy.get('#cart_items a.btn').should('have.text', 'Place Order').click();
+    cy.fillPaymentDetails(payment);
+    cy.get('#payment-form').then($form => {
+      $form[0].addEventListener('submit', (e) => e.preventDefault());
+    });
+    cy.get('[data-qa="pay-button"]').should('be.enabled').click();
+    cy.get('#success_message .alert-success')
+      .should('be.visible')
+      .and('contain.text', 'Your order has been placed successfully!');
+
+    // Validação final do pagamento
+    cy.visit('/payment_done/500');
+    cy.url().should('include', '/payment_done/');
+    cy.get('#form p')
+      .should('be.visible')
+      .and('contain.text', 'Congratulations! Your order has been confirmed!');
+
+    // Deleta a conta
+    cy.deleteAccount();
+  });
+
 });

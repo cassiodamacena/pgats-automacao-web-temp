@@ -1,0 +1,63 @@
+{
+    "users": {
+        "new": {
+            "name": "cassio",
+            "email": "cassio@email.com.br",
+            "password": "cassio123",
+            "dateOfBirth": {
+                "day": "1",
+                "month": "5",
+                "year": "1987"
+            }
+        },
+        "existing": {
+            "name": "cassio-login",
+            "email": "cassio-login@email.com.br",
+            "password": "cassio123"
+        },
+        "checkout": {
+            "name": "Cassio checkout",
+            "email": "cassio-checkout@email.com",
+            "password": "123",
+            "dateOfBirth": {
+                "day": "1",
+                "month": "1",
+                "year": "1990"
+            }
+        }
+    },
+    "address": {
+        "firstName": "cassio",
+        "lastName": "damacena",
+        "company": "QA Consulting LTDA",
+        "address1": "Endereço 1",
+        "address2": "Endereço 2",
+        "country": "United States",
+        "state": "FL",
+        "city": "MIAMI",
+        "zipcode": "10123456",
+        "mobileNumber": "12912345678"
+    },
+    "payment": {
+        "nameOnCard": "Master Test Card",
+        "cardNumber": "1111222233334444",
+        "cvc": "123",
+        "expiryMonth": "12",
+        "expiryYear": "2030"
+    },
+    "checkout": {
+        "address": {
+            "firstName": "cassio",
+            "lastName": "checkout",
+            "company": "comprador",
+            "address1": "Endereço 3",
+            "address2": "Endereço 4",
+            "country": "United States",
+            "state": "FL",
+            "city": "MIAMI",
+            "zipcode": "10123456",
+            "mobileNumber": "12912345678"
+        },
+        "message": "Mensagem de conclusão de compra"
+    }
+}
