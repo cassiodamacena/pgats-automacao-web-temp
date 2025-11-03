@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:exercicios": "cypress run --spec \"cypress/e2e/exercicios.cy.js\"",
+    "test:exercicios:open": "cypress open --e2e --browser chrome --spec \"cypress/e2e/exercicios.cy.js\"",
+    "test:exercicios:headless": "cypress run --headless --browser chrome --spec \"cypress/e2e/exercicios.cy.js\""
   },
   "keywords": [],
   "author": "",

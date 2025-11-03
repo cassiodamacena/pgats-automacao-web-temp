@@ -4,22 +4,27 @@ import testData from '../fixtures/testData.json';
 
 describe('Automation Exercise - Test Cases', function () {
 
-  const { users, address } = testData;
+  const { users } = testData;
 
   it('Test Case 1: Register User', function () {
+
+    const novoUsuario = users.new
+
     cy.goToSignupLogin();
-    cy.fillNewUserForm(users.new.name, users.new.email);
-    cy.fillSignupForm(users.new, address);
+    cy.fillNewUserForm(novoUsuario);
+    cy.fillSignupForm(novoUsuario);
     cy.verifyAccountCreatedAndLogout();
     cy.deleteAccount();
   });
 
   it('Test Case 2-4: Login User with correct email and password and Logout User', function () {
+    const usuarioExistente = users.existing;
+    
     cy.goToSignupLogin();
-    cy.fillLoginForm(users.existing.email, users.existing.password);
+    cy.fillLoginForm(usuarioExistente);
     
     // Verificar login bem-sucedido
-    cy.get('#header b').should('have.text', users.existing.name);
+    cy.get('#header b').should('have.text', usuarioExistente.name);
     cy.logout();
 
     // Verificar logout bem-sucedido
@@ -27,34 +32,37 @@ describe('Automation Exercise - Test Cases', function () {
   });
 
   it('Test Case 3: Login User with incorrect email and password', function () {
+    const usuarioExistente = users.existing;
+    usuarioExistente.password = 'senha-inválida';
+    
     cy.goToSignupLogin();
-    cy.fillLoginForm(users.existing.email, 'wrong-password');
+    cy.fillLoginForm(usuarioExistente);
     
     // Verificar dados inválidos para login
     cy.get('#form p').should('have.text', 'Your email or password is incorrect!');
   });
 
   it('Test Case 5: Register User with existing email', function () {
+    const usuarioExistente = users.existing;
+    
     cy.goToSignupLogin();
-    cy.fillNewUserForm(users.existing.name, users.existing.email);
+    cy.fillNewUserForm(usuarioExistente);
 
     // Verificar mensagem de e-mail já existente
     cy.get('#form p').should('have.text', 'Email Address already exist!');
   });
 
   it('Test Case 6: Contact Us Form', function () {
-    // Dados do contato usando a fixture existente
+    const novoUsuario = users.new;
     const contactData = {
-      name: users.new.name,
-      email: users.new.email,
+      name: novoUsuario.name,
+      email: novoUsuario.email,
       subject: 'Assunto contato aqui',
       message: 'Mensagem do contato aqui'
     };
 
-    // Navegar para a página de contato
     cy.goToContactUs();
     
-    // Preencher e enviar o formulário
     cy.fillContactForm(
       contactData.name,
       contactData.email,
@@ -112,13 +120,13 @@ describe('Automation Exercise - Test Cases', function () {
       .should('be.visible');
   });
 
-  it.only('Test Case 15: Place Order: Register before Checkout', function () {
-    const { users: { checkout: user }, checkout, payment } = testData;
+  it('Test Case 15: Place Order: Register before Checkout', function () {
+    const usuarioCheckout = users.checkout;
 
-    // Registra um novo
+    // Registra um novo usuário
     cy.goToSignupLogin();
-    cy.fillNewUserForm(user.name, user.email);
-    cy.fillSignupForm(user, checkout.address);
+    cy.fillNewUserForm(usuarioCheckout);
+    cy.fillSignupForm(usuarioCheckout);
     cy.verifyAccountCreatedAndLogout();
 
     // Adiciona produto ao carrinho e procede para checkout
@@ -127,12 +135,12 @@ describe('Automation Exercise - Test Cases', function () {
 
     // Verifica dados de entrega
     cy.get('#address_invoice h3.page-subheading').should('have.text', 'Your billing address');
-    cy.verifyDeliveryAddress(checkout.address);
-    cy.fillOrderMessage(checkout.message);
+    cy.verifyDeliveryAddress(usuarioCheckout.address);
+    cy.fillOrderMessage(usuarioCheckout.message);
 
     // Processa pagamento
     cy.get('#cart_items a.btn').should('have.text', 'Place Order').click();
-    cy.fillPaymentDetails(payment);
+    cy.fillPaymentDetails(usuarioCheckout.payment);
     cy.get('#payment-form').then($form => {
       $form[0].addEventListener('submit', (e) => e.preventDefault());
     });
